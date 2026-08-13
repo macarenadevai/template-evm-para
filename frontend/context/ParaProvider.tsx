@@ -3,7 +3,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ParaProvider } from "@getpara/react-sdk";
 import "@getpara/react-sdk/styles.css";
-import { apiKey, environment, paraModalConfig } from "@/config/para";
+import {
+    apiKey,
+    environment,
+    externalWalletConfig,
+    paraModalConfig,
+} from "@/config/para";
 
 const queryClient = new QueryClient();
 
@@ -13,6 +18,7 @@ export function ParaAppProvider({ children }: { children: React.ReactNode }) {
             <ParaProvider
                 paraClientConfig={{ apiKey, env: environment }}
                 config={{ appName: "template-evm-para" }}
+                externalWalletConfig={externalWalletConfig}
                 paraModalConfig={paraModalConfig}
             >
                 {children}

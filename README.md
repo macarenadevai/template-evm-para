@@ -139,6 +139,7 @@ Before using this template, make sure you have the following installed on your m
 You will also need:
 
 - A **Para API key** (free) from [cloud.getpara.com](https://cloud.getpara.com) for embedded wallet login.
+- A **Reown Project ID** (free, optional) from [cloud.reown.com](https://cloud.reown.com) to let users connect existing wallets via WalletConnect (QR). Injected wallets (MetaMask, Coinbase) work without it.
 - RPC URLs for the networks you want to deploy to (e.g., from [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/)).
 - Explorer API keys for contract verification (e.g., [Arbiscan](https://arbiscan.io/), [Basescan](https://basescan.org/)).
 
@@ -169,7 +170,14 @@ npm install
 
 ### 4. Configure environment variables
 
-See the [Environment Variables](#environment-variables) section below.
+Copy the templates and fill them in:
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+```
+
+See the [Environment Variables](#environment-variables) section below for details.
 
 ---
 
@@ -241,13 +249,22 @@ npm run start
 
 ### Wallet login (Para)
 
-Click **Connect Wallet** to open the Para modal. Users can create an embedded wallet with:
+Click **Connect Wallet** to open the Para modal. Users have **two options**:
+
+**1. Create an embedded wallet (Para MPC)** — the wallet lives inside the app:
 
 - **Email** + passkey
 - **OAuth** (Google, Discord)
 - Phone (SMS)
 
-No browser extension or redirect needed — the wallet is created inside the app via MPC.
+No browser extension or redirect needed. The private key is split via MPC (Multi-Party Computation) between Para's secure enclave and the user's device — the full key never exists in one place.
+
+**2. Connect an existing wallet:**
+
+- **Injected wallets** (MetaMask, Coinbase Wallet, ...) detected in the browser
+- **WalletConnect** via QR code (Rainbow, Trust, Rabby, ...) — requires `NEXT_PUBLIC_REOWN_PROJECT_ID`
+
+Both options are shown side by side in the same modal (`authLayout: ["AUTH:FULL", "EXTERNAL:FULL"]`).
 
 > Test credentials (BETA): any `*@test.getpara.com` email with any OTP (e.g. `123456`).
 
@@ -280,6 +297,8 @@ Replace `button` with any component from the [shadcn/ui catalog](https://ui.shad
 
 ### Backend — `backend/.env`
 
+> Copy from `backend/.env.example` and fill in your values.
+
 ```bash
 # Your wallet private key (without 0x prefix)
 PRIVATE_KEY=
@@ -299,16 +318,30 @@ BASESCAN_API_KEY=
 REPORT_GAS=false
 ```
 
-> ⚠️ Never commit your `.env` file. It is already protected by `.gitignore`.
+> ⚠️ Never commit your `.env` file. It is already protected by `.gitignore`. Only `.env.example` (the template) is committed.
 
 ### Frontend — `frontend/.env.local`
 
+> Copy from `frontend/.env.example` and fill in your values.
+
 ```bash
+# Para — embedded wallet (REQUIRED)
 # Get your API key at https://cloud.getpara.com
 NEXT_PUBLIC_PARA_API_KEY=
+
+# Reown WalletConnect Project ID (OPTIONAL — for external wallets via QR)
+# Get one at https://cloud.reown.com
+NEXT_PUBLIC_REOWN_PROJECT_ID=
+
+# RPC URLs (OPTIONAL — public RPCs are used as fallback)
+NEXT_PUBLIC_ARBITRUM_RPC_URL=
+NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL=
+NEXT_PUBLIC_BASE_RPC_URL=
+NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL=
+NEXT_PUBLIC_MONAD_TESTNET_RPC_URL=
 ```
 
-> ⚠️ Never commit your `.env.local` file. It is already protected by `.gitignore`.
+> ⚠️ Never commit your `.env.local` file. It is already protected by `.gitignore`. Only `.env.example` (the template) is committed.
 
 ---
 
